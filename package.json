@@ -1,7 +1,11 @@
 {
   "name": "chat-speaker",
   "version": "0.1.0",
-  "description": "",
+  "author": {
+    "name": "blerch",
+    "email": "contact@bler.ch"
+  },
+  "description": "UberDuck API TTS Reader ",
   "main": "index.js",
   "scripts": {
     "start": "electron-forge start",
