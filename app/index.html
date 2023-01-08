@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset='UTF-8'>
+        <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+        <title>Chat Speaker</title>
+        <link rel='stylesheet' href='./style.css'>
+    </head>
+    <body>
+        <script src='./render.js'></script>
+        <title-bar>
+            <!-- <img src="" style="object-fit: contain";/> -->
+            <div id="title">
+                <h4>Chat Speaker</h4>
+            </div>
+            <div id="titlebar-ctrls">
+                 <span id="tb-min"><img src="./assets/tb-min.svg"></span>
+                 <span id="tb-max"><img src="./assets/tb-max.svg"></span>
+                 <span id="tb-close"><img src="./assets/tb-close.svg"></span>
+            </div>
+        </title-bar>
+        <main>
+            <div class="home">
+                <img src="./assets/settings.svg" id="settings-icon">
+                <h2 id="message"></h2>
+                <h4 id="chatter"></h4>
+                <button id="skip-chat" type="button">Skip</button>
+            </div>
+            <form id="config-form" class="hide">
+                <div>
+                    <div class="top-form-div">
+                        <h5>Twitch Bot</h5>
+                        <button type="button" id="back|form">Close</button>
+                        <button type="button" id="save|form" class="save">Save</button>
+                    </div>
+                    <div class="form-div">
+                        <span style="flex-basis: 45%">
+                            <label for="t_username">Username</label>
+                            <input name="t_username" id="t_username"/>
+                        </span>
+                        <span style="flex-basis: 45%">
+                            <label for="t_password">OAuth</label>
+                            <private-input>
+                                <input name="t_password" id="t_password" type="password"/>
+                                <button type="button" id="show|t_password" placeholder="e.x. oauth:..."><img src="./assets/eye.svg"></button>
+                            </private-input>
+                        </span>
+                        <span style="flex-basis: 45%">
+                            <label for="t_channel">Channel</label>
+                            <input name="t_channel" id="t_channel"/>
+                        </span>
+                        <span style="flex-basis: 45%">
+                            <label for="t_voice">Voice</label>
+                            <input name="t_voice" id="t_voice"/>
+                        </span>
+                    </div>
+                </div>
+                <div>
+                    <h5>UberDuck API</h5>
+                    <div class="form-div">
+                        <span>
+                            <label for="ud_key">Key</label>
+                            <private-input>
+                                <input name="ud_key" id="ud_key" class="hidden-value" type="password"/>
+                                <button type="button" id="show|ud_key" placeholder="e.x. pub_..."><img src="./assets/eye.svg"></button>
+                            </private-input>
+                        </span>
+                        <span>
+                            <label for="ud_secret">Secret</label>
+                            <private-input>
+                                <input name="ud_secret" id="ud_secret" class="hidden-value" type="password"/>
+                                <button type="button" id="show|ud_secret" placeholder="e.x. pk_..."><img src="./assets/eye.svg"></button>
+                            </private-input>
+                        </span>
+                    </div>
+                </div>
+                <pre id="version-number"></pre>
+            </form>
+        </main>
+    </body>
+</html>

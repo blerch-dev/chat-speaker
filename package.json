@@ -1,0 +1,17 @@
+{
+  "name": "chat-speaker",
+  "version": "0.1.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node . --nogui",
+    "app": "electron ."
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "electron": "^22.0.0",
+    "tmi.js": "^1.8.5",
+    "uberduck-api": "^1.2.2"
+  }
+}
