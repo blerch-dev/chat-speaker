@@ -4,8 +4,8 @@ module.exports = {
       name: "@electron-forge/publisher-github",
       config: {
         repository: {
-          owner: blerch-dev,
-          name: chat-speaker
+          owner: "blerch-dev",
+          name: "chat-speaker"
         },
         prerelease: true
       }
