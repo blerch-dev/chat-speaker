@@ -5,7 +5,7 @@ class UberDuck {
         this.secret = data?.secret || undefined;
     }
 
-    setConfig(data) {
+    setConfig = (data) => {
         this.key = data?.key || this.key;
         this.secret = data?.secret || this.secret;
 
@@ -24,9 +24,11 @@ class UberDuck {
 const tmi = require('tmi.js');
 class TwitchChatBot {
     constructor(cb, data = {}) {
-        this.username = data?.username || undefined;
-        this.password = data?.password || undefined;
-        this.channels = data?.channels || [];
+        this.setConfig(data, {
+            username: undefined,
+            password: undefined,
+            channels: []
+        });
 
         this.ignored_tags = data?.ignored_tags || [];
         this.ignored_phrases = data?.ignored_phrases || []; // not implemented
@@ -34,7 +36,8 @@ class TwitchChatBot {
         this.setClient(cb);
     }
 
-    isConnected() { return this.client.readyState() !== 'CLOSED' }
+    isConnected() { return this.client.readyState() !== 'CLOSED' && this.client.readyState() !== 'CLOSING'; }
+    isClient() { return this.client instanceof tmi.Client }
 
     async connect() {
         if(this.isConnected())
@@ -43,16 +46,35 @@ class TwitchChatBot {
         return await this.client.connect();
     }
 
-    setConfig(data) {
-        this.username = data?.username || this.username;
-        this.password = data?.password || this.password;
-        this.channels = data?.channels || this.channels;
+    setConfig = (data, dv = {}) => {
+        this.username = data?.username || this.username || dv?.username;
+        this.password = data?.password || this.password || dv?.password;
+        this.channels = data?.channels || this.channels || dv?.channels;
+        this.channels = Array.isArray(this.channels) ? this.channels.filter((c) => typeof(c) === 'string') : [];
 
         return this;
     }
 
-    setClient(cb) {
-        if(cb == undefined)
+    /*
+        [17:56] error: Cannot disconnect from server. Socket is not opened or connection is already closing.
+        (node:31384) UnhandledPromiseRejectionWarning: Cannot disconnect from server. Socket is not opened or connection is already closing.
+        (Use `electron --trace-warnings ...` to show where the warning was created)
+        (node:31384) UnhandledPromiseRejectionWarning: Unhandled promise rejection. This error originated either by throwing inside of an async function without a catch block, or by rejecting a promise which was not handled with .catch(). To terminate the node process on unhandled promise rejection, use the CLI flag `--unhandled-rejections=strict` (see https://nodejs.org/api/cli.html#cli_unhandled_rejections_mode). (rejection id: 2)
+        [17:56] error: Could not connect to server. Reconnecting in 2 seconds..
+        (node:31384) UnhandledPromiseRejectionWarning: Connection closed.
+        (node:31384) UnhandledPromiseRejectionWarning: Unhandled promise rejection. This error originated either by throwing inside of an async function without a catch block, or by rejecting a promise which was not handled with .catch(). To terminate the node process on unhandled promise rejection, use the CLI flag `--unhandled-rejections=strict` (see https://nodejs.org/api/cli.html#cli_unhandled_rejections_mode). (rejection id: 3)
+        (base) PS C:\Users\bwben\Documents\Code\chat-speaker>
+
+        // Error when disconnecting with full queue (i think)
+    */
+
+    setClient = async (cb) => {
+        if(this.client instanceof tmi.Client) {
+            if(this.isConnected())
+                await this.client.disconnect();
+        }
+
+        if(cb == undefined || this.channels.length < 1)
             return;
 
         this.client = new tmi.Client({
@@ -76,15 +98,49 @@ class AudioManager {
         this.download = download;
         this.send = send;
 
+        this.paused = false;
+        this.playing = false;
+        this.spt = Date.now();
+        this.queue = [];
+
         this.voice = data?.voice || 'eminem';
 
         this.setConfig(data);
     }
 
-    onMessage = async (channel, tags, message, self) => {
+    onMessage = (channel, tags, message, self) => {
         //console.log(`${tags.username}: ${message}`);
         // Options for chat filtering here
+        if(this.paused === true)
+            return;
 
+        // Percent Chance
+        if(Math.random() < (0.5 - (this.queue.length/5))) {
+            let queue_length = this.queue.push({ channel, tags, message, self });
+            if(!this.playing && queue_length === 1)
+                this.readMessage(this.queue.shift());
+        }
+    }
+
+    onFinish = () => {
+        this.playing = false;
+        if(this.queue.length > 0)
+            this.readMessage(this.queue.shift());
+    }
+
+    readMessage = async (data) => {
+        if(this.paused === true)
+            return;
+
+        if(this.playing) {
+            if(Date.now() - this.spt > (3 * 60 * 1000)) { // 3 minutes till auto play
+                this.playing = false;
+            } else {
+                return; // skip if playing
+            }
+        }
+
+        const { channel, tags, message, self } = data;
         let character = this.voice;
         let url = await this.uberduck.getUrl(character, message);
         if(typeof(url) === 'string') {
@@ -92,15 +148,18 @@ class AudioManager {
             if(result instanceof Error) {
                 console.error('Download Failed.', result);
             } else {
-                this.send(result.path, result.name, {
+                this.playing = this.send(result.path, result.name, {
                     message: message,
                     username: tags.username
                 });
+
+                if(this.playing)
+                    this.spt = Date.now();
             }
         } 
     }
 
-    setConfig(data) {
+    setConfig = (data) => {
         let preferred_uber = data?.uberduck?.filter((ub) => ub.preferred)[0] || data?.uberduck[0] || undefined;
         let preferred_twitch = data?.twitch?.filter((t) => t.preferred)[0] || data?.twitch[0] || undefined;
 
@@ -114,7 +173,8 @@ class AudioManager {
         else
             this.twitchbot = new TwitchChatBot(this.onMessage, preferred_twitch);
 
-        this.twitchbot.connect();
+        if(this.twitchbot instanceof TwitchChatBot && this.twitchbot.isClient())
+            this.twitchbot.connect();
     }
 }
 
@@ -141,6 +201,7 @@ class App {
         config.uberduck = json?.uberduck ?? config?.uberduck;
         config.voice = json?.voice ?? config?.voice;
         config.version = pkg?.version;
+        config.paused = json?.paused ?? config?.paused;
 
         let result = await fs.promises.writeFile(this.app_path + 'config.json', JSON.stringify(config));
         if(!ignore_am)
@@ -187,7 +248,10 @@ class App {
     playSound = async (fullpath, filename, data) => {
         if(this.window instanceof BrowserWindow) {
             this.window.webContents.send('sound-path', { path: fullpath, name: filename, options: data });
+            return true;
         }
+
+        return false;
     }
 
     async Start() {
@@ -227,10 +291,16 @@ class App {
     
         ipcMain.on('delete-file', (event, ...args) => {
             this.deleteFile(args[0]);
+            this.audioManager.onFinish();
         });
     
         ipcMain.on('config-update', (event, ...args) => {
             this.updateConfig(args[0]);
+        });
+
+        ipcMain.on('toggle-pause', (event, ...args) => {
+            this.audioManager.paused = typeof(args[0]) === 'boolean' ? args[0] : !this.audioManager.paused;
+            event.reply('pause-state', this.audioManager.paused);
         });
     }
 }

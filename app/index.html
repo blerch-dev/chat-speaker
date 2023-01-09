@@ -21,7 +21,10 @@
         </title-bar>
         <main>
             <div class="home">
-                <img src="./assets/settings.svg" id="settings-icon">
+                <span>
+                    <img src="./assets/settings.svg" id="settings-icon">
+                    <button id="pause-chat" type="button">Pause</button>
+                </span>
                 <h2 id="message"></h2>
                 <h4 id="chatter"></h4>
                 <button id="skip-chat" type="button">Skip</button>
@@ -36,13 +39,13 @@
                     <div class="form-div">
                         <span style="flex-basis: 45%">
                             <label for="t_username">Username</label>
-                            <input name="t_username" id="t_username"/>
+                            <input name="t_username" id="t_username" required/>
                         </span>
                         <span style="flex-basis: 45%">
                             <label for="t_password">OAuth</label>
                             <private-input>
                                 <input name="t_password" id="t_password" type="password"/>
-                                <button type="button" id="show|t_password" placeholder="e.x. oauth:..."><img src="./assets/eye.svg"></button>
+                                <button type="button" id="show|t_password" placeholder="e.x. oauth:..." required><img src="./assets/eye.svg"></button>
                             </private-input>
                         </span>
                         <span style="flex-basis: 45%">
@@ -62,14 +65,14 @@
                             <label for="ud_key">Key</label>
                             <private-input>
                                 <input name="ud_key" id="ud_key" class="hidden-value" type="password"/>
-                                <button type="button" id="show|ud_key" placeholder="e.x. pub_..."><img src="./assets/eye.svg"></button>
+                                <button type="button" id="show|ud_key" placeholder="e.x. pub_..." required><img src="./assets/eye.svg"></button>
                             </private-input>
                         </span>
                         <span>
                             <label for="ud_secret">Secret</label>
                             <private-input>
                                 <input name="ud_secret" id="ud_secret" class="hidden-value" type="password"/>
-                                <button type="button" id="show|ud_secret" placeholder="e.x. pk_..."><img src="./assets/eye.svg"></button>
+                                <button type="button" id="show|ud_secret" placeholder="e.x. pk_..." required><img src="./assets/eye.svg"></button>
                             </private-input>
                         </span>
                     </div>

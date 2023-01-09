@@ -92,17 +92,66 @@ div.home {
     overflow: hidden;
 }
 
-#settings-icon {
+div.home > span {
     position: absolute;
     right: 0px;
     top: 0px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 6px;
+    flex-direction: row-reverse;
+}
+
+#settings-icon {
     width: 20px;
+}
+
+#pause-chat {
+    padding: 6px 10px;
+    border-radius: 5px;
+    color: #ffffff22;
+    transition: 0.2s all;
+}
+
+#pause-chat:hover {
+    color: #ffffff44;
+}
+
+#pause-chat.paused {
+    transition: 0.2s all;
+    background-color: #d40707cc;
+}
+
+#pause-chat.paused:hover {
+    background-color: #d40707;
+}
+
+#skip-chat {
+    opacity: 0;
+    transition: 0.2s all;
+    padding: 8px 15px;
+    background-color: #d40707cc;
+    border-radius: 5px;
+    position: absolute;
+    right: 0px;
+    bottom: 0px;
+    overflow: hidden;
+}
+
+#skip-chat:hover {
+    background-color: #d40707;
+}
+
+#skip-chat.display-text {
+    opacity: 1;
 }
 
 #message {
     transition: 0.2s all;
     font-size: 40px;
     color: transparent;
+    text-align: center;
 }
 
 #message > span, #chatter {
@@ -117,22 +166,6 @@ div.home {
 
 #message > span.display-text, #chatter.display-text {
     color: #ffffffcc;
-}
-
-#skip-chat {
-    opacity: 0;
-    transition: 0.2s all;
-    padding: 8px 15px;
-    background-color: #d40707;
-    border-radius: 5px;
-    position: absolute;
-    right: 0px;
-    bottom: 0px;
-    overflow: hidden;
-}
-
-#skip-chat.display-text {
-    opacity: 1;
 }
 
 form {

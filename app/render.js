@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
             twitch: [{
                 username: document.getElementById('t_username')?.value || undefined,
                 password: document.getElementById('t_password')?.value || undefined,
-                channels: [document.getElementById('t_channel')?.value || "xqc"]
+                channels: [document.getElementById('t_channel')?.value || undefined]
             }],
             uberduck: [{
                 key: document.getElementById('ud_key')?.value || undefined,
@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
             voice: document.getElementById('t_voice').value || undefined
         }
 
-        if(typeof(config.twitch[0].username) !== 'string' || typeof(config.twitch[0].password) !== 'string' || typeof(config.twitch[0].channels[0]) !== 'string' ||
+        if(typeof(config.twitch[0].username) !== 'string' || typeof(config.twitch[0].password) !== 'string' ||
             typeof(config.uberduck[0].key) !== 'string' || typeof(config.uberduck[0].secret) !== 'string') {
             alert('Missing required fields.');
         } else {
@@ -72,6 +72,8 @@ window.addEventListener("message", async (event) => {
         document.getElementById('t_voice').value = config?.voice || '';
         document.getElementById('ud_key').value = config?.uberduck[0]?.key || '';
         document.getElementById('ud_secret').value = config?.uberduck[0]?.secret || '';
+    } else if(message.id === 'pause-state') {
+        
     } else if(message.id === 'sound-path') {
         showTTS(message.data?.options)
         tts.src = message.data.path;
